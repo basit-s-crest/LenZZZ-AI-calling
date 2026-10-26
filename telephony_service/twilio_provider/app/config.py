@@ -19,6 +19,7 @@ class TwilioSettings(BaseSettings):
     from_number: str                       # default caller ID (a number you own in Twilio)
     default_message: str = "Hello, this is a test call from our system."
     ring_timeout_seconds: int | None = None  # set TWILIO_RING_TIMEOUT_SECONDS in .env (not supported on trial accounts)
+    twiml_url: str | None = None             # set TWILIO_TWIML_URL to a TwiML Bin URL (recommended for trial accounts)
 
     @field_validator("account_sid")
     @classmethod

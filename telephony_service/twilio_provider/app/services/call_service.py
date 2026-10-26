@@ -25,7 +25,9 @@ class CallService:
         result = await self._client.create_call(
             to=req.to_number,
             from_=from_number,
-            twiml=twiml,
+            # Prefer a TwiML Bin URL (works on trial accounts); fall back to inline twiml.
+            url=self._settings.twiml_url or None,
+            twiml=None if self._settings.twiml_url else twiml,
             timeout=self._settings.ring_timeout_seconds,  # None omits it (required for trial accounts)
         )
         log.info("call created sid=%s to=%s status=%s", result.sid, mask_number(req.to_number), result.status)
