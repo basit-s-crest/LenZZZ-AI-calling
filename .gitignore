@@ -1,0 +1,7 @@
+
+
+# Credentials
+*.env
+
+# Environment
+.venv/*

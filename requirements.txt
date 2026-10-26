@@ -1,0 +1,5 @@
+-r telephony_service/twilio_provider/requirements.txt
+# -r telnyx_provider/requirements.txt
+uvicorn[standard]>=0.29
+pytest>=8.0
+httpx>=0.27
