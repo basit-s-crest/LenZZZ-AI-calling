@@ -7,9 +7,9 @@ from fastapi import HTTPException
 
 # Twilio error code -> actionable hint (the ones you will hit first).
 _HINTS = {
-    0:     "Trial account: Twilio rejected an invalid or disallowed parameter. "
-           "Set TWILIO_TWIML_URL in .env to a TwiML Bin URL instead of using inline TwiML. "
-           "See README for setup steps.",
+    0:     "Twilio rejected an invalid or disallowed parameter. "
+           "Verify your PUBLIC_BASE_URL and call parameters.",
+
     20003: "Authentication failed. Check TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN.",
     21211: "The destination is not a valid phone number.",
     21212: "The configured 'from' number is not valid for this account.",

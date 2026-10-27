@@ -2,11 +2,11 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from twilio_provider import router
-from twilio_provider.api.deps import get_call_service
-from twilio_provider.clients.twilio_client import CallResult
-from twilio_provider.config import TwilioSettings
-from twilio_provider.services.call_service import CallService
+from twilio_provider.app.api.routes_calls import router
+from twilio_provider.app.api.deps import get_call_service
+from twilio_provider.app.clients.twilio_client import CallResult
+from twilio_provider.app.config import TwilioSettings, AppSettings
+from twilio_provider.app.services.call_service import CallService
 
 
 class FakeTwilioClient:
@@ -32,11 +32,21 @@ def settings():
 
 
 @pytest.fixture
-def make_client(settings):
+def app_settings():
+    return AppSettings(
+        public_base_url="https://test.ngrok.app",
+        status_callback_url=None,
+        request_timeout=10.0,
+    )
+
+
+
+@pytest.fixture
+def make_client(settings, app_settings):
     def _make(error: Exception | None = None):
         fake = FakeTwilioClient(error)
         app = FastAPI()
         app.include_router(router)
-        app.dependency_overrides[get_call_service] = lambda: CallService(fake, settings)
+        app.dependency_overrides[get_call_service] = lambda: CallService(fake, settings, app_settings)
         return TestClient(app), fake
     return _make

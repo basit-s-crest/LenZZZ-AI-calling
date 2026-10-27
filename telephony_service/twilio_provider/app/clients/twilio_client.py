@@ -11,7 +11,9 @@ from twilio.base.exceptions import TwilioRestException
 from twilio.http.http_client import TwilioHttpClient
 from twilio.rest import Client
 
+from ..config import AppSettings
 from ..core.errors import TwilioAPIError
+from ..services.twiml_builder import build_stream_twiml
 
 
 @dataclass(frozen=True)
@@ -21,25 +23,28 @@ class CallResult:
 
 
 class TwilioClient:
-    def __init__(self, account_sid: str, auth_token: str, request_timeout: float = 10.0):
-        self._client = Client(account_sid, auth_token, http_client=TwilioHttpClient(timeout=request_timeout))
+    def __init__(self, account_sid: str, auth_token: str, app_settings: AppSettings):
+        self._client = Client(
+            account_sid,
+            auth_token,
+            http_client=TwilioHttpClient(timeout=app_settings.request_timeout),
+        )
+        self._app_settings = app_settings
 
     async def create_call(
-        self, *, to: str, from_: str, twiml: str | None = None, url: str | None = None, timeout: int | None = None
+        self, *, to: str, from_: str, url: str
     ) -> CallResult:
-        if not twiml and not url:
-            raise ValueError("Either twiml or url must be provided")
-        # IMPORTANT: The Twilio SDK uses `values.unset` (a sentinel object) — NOT Python None —
-        # to indicate "omit this field from the POST body". Passing None causes the SDK to
-        # serialise it as an empty string, which Twilio rejects with "Required parameter missing".
+
+        status_callback = self._app_settings.status_callback_url
         try:
             call = await asyncio.to_thread(
                 self._client.calls.create,
                 to=to,
                 from_=from_,
-                url=url if url else twilio_values.unset,
-                twiml=twiml if twiml else twilio_values.unset,
-                timeout=timeout if timeout is not None else twilio_values.unset,
+                url=url,
+                # method="POST",
+                # status_callback=status_callback if status_callback else twilio_values.unset,
+                # status_callback_event=["initiated", "ringing", "answered", "completed"] if status_callback else twilio_values.unset,
             )
         except TwilioRestException as exc:
             raise TwilioAPIError(
