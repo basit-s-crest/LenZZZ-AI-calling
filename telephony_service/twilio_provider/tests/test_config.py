@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from twilio_provider.config import TwilioSettings
+from twilio_provider.app.config import TwilioSettings
 
 
 def test_valid_settings():

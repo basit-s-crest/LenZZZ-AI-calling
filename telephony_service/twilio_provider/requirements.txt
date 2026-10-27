@@ -2,3 +2,5 @@ fastapi>=0.110
 pydantic>=2.6
 pydantic-settings>=2.2
 twilio>=9.0
+python-multipart>=0.0.9
+
