@@ -12,3 +12,6 @@
 
 # Environment
 .venv/*
+.python-version
+uv.lock
+

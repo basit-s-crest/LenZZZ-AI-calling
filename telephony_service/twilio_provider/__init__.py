@@ -1,1 +1,3 @@
-# Placeholder to make the twilio package importable
+from .app.api.routes_calls import router
+
+__all__ = ["router"]

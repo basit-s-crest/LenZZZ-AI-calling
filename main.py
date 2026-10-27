@@ -15,6 +15,8 @@ from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from telephony_service.twilio_provider.app.api.routes_calls import router as twilio_router
+from ai_agent.transports.browser_ws import router as voice_agent_router
+from fastapi.staticfiles import StaticFiles
 
 # from telnyx_provider import router as telnyx_router   # <- register later
 
@@ -48,7 +50,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Telephony Service", lifespan=lifespan)
+app = FastAPI(title="Telephony & AI Voice Agent Service", lifespan=lifespan)
 
 
 @app.get("/health", tags=["system"])
@@ -58,3 +60,11 @@ async def health() -> dict:
 
 app.include_router(twilio_router, dependencies=[Depends(require_api_key)])
 # app.include_router(telnyx_router, dependencies=[Depends(require_api_key)])
+
+# Register AI Voice Agent WebSocket router
+app.include_router(voice_agent_router)
+
+# Mount static files for UI testing (http://localhost:8080)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/", StaticFiles(directory="static", html=True), name="ui")
+
